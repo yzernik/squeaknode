@@ -79,7 +79,7 @@ class WebadminConfig(Config):
     username = key(cast=str, required=False, default="")
     password = key(cast=str, required=False, default="")
     use_ssl = key(cast=bool, required=False, default=False)
-    login_disabled = key(cast=bool, required=False, default=False)
+    login_required = key(cast=bool, required=False, default=True)
     allow_cors = key(cast=bool, required=False, default=False)
 
 

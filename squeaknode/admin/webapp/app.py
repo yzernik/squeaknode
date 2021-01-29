@@ -492,20 +492,20 @@ class SqueakAdminWebServer:
         username,
         password,
         use_ssl,
-        login_disabled,
+        login_required,
         allow_cors,
         handler,
     ):
         self.host = host
         self.port = port
         self.use_ssl = use_ssl
-        self.login_disabled = login_disabled
+        self.login_required = login_required
         self.allow_cors = allow_cors
         self.app = create_app(handler, username, password)
 
     def serve(self):
-        # Set LOGIN_DISABLED and allow CORS if login not required.
-        if self.login_disabled:
+        # Set LOGIN_REQUIRED and allow CORS if login not required.
+        if not self.login_required:
             self.app.config["LOGIN_DISABLED"] = True
 
         # Allow CORS

@@ -64,7 +64,7 @@ def load_admin_web_server(config, handler) -> SqueakAdminWebServer:
         config.webadmin.username,
         config.webadmin.password,
         config.webadmin.use_ssl,
-        config.webadmin.login_disabled,
+        config.webadmin.login_required,
         config.webadmin.allow_cors,
         handler,
     )
