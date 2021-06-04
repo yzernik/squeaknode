@@ -83,9 +83,12 @@ class TimelineDownloadSync(DownloadSync):
         try:
             peer_connection.download(self.block_interval)
         except Exception:
-            logger.info("Failed to download timeline from peer: {}".format(
-                peer_connection.peer_address,
-            ))
+            logger.error(
+                "Failed to download timeline from peer: {}".format(
+                    peer_connection.peer_address,
+                ),
+                exc_info=True,
+            )
 
 
 class SingleSqueakDownloadSync(DownloadSync):
@@ -129,9 +132,12 @@ class TimelineUploadSync(UploadSync):
         try:
             peer_connection.upload()
         except Exception:
-            logger.info("Failed to upload timeline to peer: {}".format(
-                peer_connection.peer_address,
-            ))
+            logger.error(
+                "Failed to upload timeline to peer: {}".format(
+                    peer_connection.peer_address,
+                ),
+                exc_info=True,
+            )
 
 
 class SingleSqueakUploadSync(UploadSync):
