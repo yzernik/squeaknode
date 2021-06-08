@@ -9,6 +9,7 @@ services:
     ports:
       - 8332:8332
       - 18332:18332
+      - 28332:28332
 
   lnd:
     image: lnd

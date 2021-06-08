@@ -24,6 +24,7 @@ DEFAULT_WEBADMIN_HOST = "0.0.0.0"
 DEFAULT_WEBADMIN_PORT = 12994
 DEFAULT_BITCOIN_RPC_HOST = "localhost"
 DEFAULT_BITCOIN_RPC_PORT = 8334
+DEFAULT_BITCOIN_ZEROMQ_PORT = 28332
 BITCOIN_RPC_PORT = {
     "mainnet": 8332,
     "testnet": 18332,
@@ -52,6 +53,8 @@ class BitcoinConfig(Config):
     rpc_pass = key(cast=str, required=False, default="")
     rpc_use_ssl = key(cast=bool, required=False, default=False)
     rpc_ssl_cert = key(cast=str, required=False, default="")
+    zeromq_port = key(cast=int, required=False,
+                      default=DEFAULT_BITCOIN_ZEROMQ_PORT)
 
 
 @section('lnd')

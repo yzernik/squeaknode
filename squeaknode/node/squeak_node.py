@@ -7,6 +7,7 @@ from squeak.params import SelectParams
 from squeaknode.admin.squeak_admin_server_handler import SqueakAdminServerHandler
 from squeaknode.admin.squeak_admin_server_servicer import SqueakAdminServerServicer
 from squeaknode.admin.webapp.app import SqueakAdminWebServer
+from squeaknode.bitcoin.bitcoin_block_subscription_client import BitcoinBlockSubscriptionClient
 from squeaknode.bitcoin.bitcoin_core_bitcoin_client import BitcoinCoreBitcoinClient
 from squeaknode.config.config import SqueaknodeConfig
 from squeaknode.core.squeak_core import SqueakCore
@@ -21,6 +22,7 @@ from squeaknode.node.squeak_deletion_worker import SqueakDeletionWorker
 from squeaknode.node.squeak_offer_expiry_worker import SqueakOfferExpiryWorker
 from squeaknode.node.squeak_peer_sync_worker import SqueakPeerSyncWorker
 from squeaknode.node.squeak_rate_limiter import SqueakRateLimiter
+from squeaknode.node.subscribe_blocks_worker import SubscribeBlocksWorker
 from squeaknode.server.squeak_server_handler import SqueakServerHandler
 from squeaknode.server.squeak_server_servicer import SqueakServerServicer
 from squeaknode.sync.squeak_sync_controller import SqueakSyncController
@@ -64,6 +66,11 @@ class SqueakNode:
             self.config.core.subscribe_invoices_retry_s,
         )
 
+        block_subscription_client = BitcoinBlockSubscriptionClient(
+            self.config.bitcoin.rpc_host,
+            self.config.bitcoin.zeromq_port,
+        )
+
         squeak_controller = SqueakController(
             squeak_db,
             squeak_core,
@@ -79,32 +86,51 @@ class SqueakNode:
         )
 
         admin_handler = load_admin_handler(
-            lightning_client, squeak_controller, sync_controller)
+            lightning_client,
+            squeak_controller,
+            sync_controller,
+        )
 
         self.admin_rpc_server = load_admin_rpc_server(
-            self.config, admin_handler, self.stopped)
+            self.config,
+            admin_handler,
+            self.stopped,
+        )
 
         self.admin_web_server = load_admin_web_server(
-            self.config, admin_handler, self.stopped)
+            self.config,
+            admin_handler,
+            self.stopped,
+        )
 
         self.sync_worker = load_sync_worker(
-            self.config, sync_controller)
+            self.config,
+            sync_controller,
+        )
 
         self.squeak_offer_expiry_worker = SqueakOfferExpiryWorker(
             squeak_controller,
             self.config.core.offer_deletion_interval_s,
         )
         self.sent_offers_worker = ProcessReceivedPaymentsWorker(
-            payment_processor, self.stopped,
+            payment_processor,
+            self.stopped,
         )
         self.squeak_deletion_worker = SqueakDeletionWorker(
             squeak_controller,
             self.config.core.squeak_deletion_interval_s,
         )
+        self.subscribe_blocks_worker = SubscribeBlocksWorker(
+            block_subscription_client,
+            self.stopped,
+        )
 
         handler = load_handler(squeak_controller)
         self.server = load_rpc_server(
-            self.config, handler, self.stopped)
+            self.config,
+            handler,
+            self.stopped,
+        )
 
     def start_running(self):
         # start admin rpc server
@@ -122,6 +148,7 @@ class SqueakNode:
         self.squeak_offer_expiry_worker.start_running()
         self.sent_offers_worker.start_running()
         self.squeak_deletion_worker.start_running()
+        self.subscribe_blocks_worker.start_running()
 
         # start peer rpc server
         if self.config.server.rpc_enabled:
