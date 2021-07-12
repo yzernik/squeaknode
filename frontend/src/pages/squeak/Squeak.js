@@ -244,6 +244,18 @@ export default function SqueakPage() {
     )
   }
 
+  function DummyContent() {
+    console.log("replySqueaks: " + replySqueaks);
+    return (
+      <>
+        <TimelineItem
+            className={classes.dummyContent}
+            >
+        </TimelineItem>
+      </>
+    )
+  }
+
   function SqueakContent() {
     return (
       <Timeline align="left">
@@ -252,6 +264,7 @@ export default function SqueakPage() {
         {AncestorsContent()}
         {CurrentSqueakContent()}
         {RepliesContent()}
+        {DummyContent()}
 
       </Timeline>
     )

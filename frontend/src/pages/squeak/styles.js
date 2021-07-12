@@ -16,5 +16,9 @@ export default makeStyles(theme => ({
   // TODO: adjust this value accordingly
     flex: 0.0,
     padding: 0,
+  },
+  dummyContent: {
+  // TODO: use a relative height of the containing element.
+    minHeight: "500px",
   }
 }));
